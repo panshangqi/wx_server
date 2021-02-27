@@ -1,11 +1,15 @@
 const Koa = require('koa')
-const KoaRouter = require('koa-router');
-const router = KoaRouter();
+
+const koaLogger = require('koa-logger')
+const bodyParser = require('koa-bodyparser')
 const path = require('path')
 const fs = require('fs')
 const staticFiles = require('koa-static')
-
+const ctx_function = require('./middlewares/ctx_function')
+const controllers = require('./controllers')
+const {historyApiFallback} = require('koa2-connect-history-api-fallback');
 const app = new Koa()
+const DB = require('./common/db')
 const mime = {
     'mp4': 'video/mp4',
     'webm': 'video/webm',
@@ -16,17 +20,25 @@ const mime = {
     'mp3': 'audio/mpeg',
     'wav': 'audio/x-wav'
 }
-app.use(staticFiles(path.join(__dirname + '/static/')))
-app.use(staticFiles(path.join(__dirname + '../files/')))
-router.get('/',(ctx)=>{
-    ctx.response.type = 'html';
-    ctx.response.body = fs.createReadStream(__dirname+'/index.html');
-});
 
-app.use(router.routes())//启动路由
+app.use(koaLogger())
+app.use(bodyParser({
+    "formLimit": "50mb",
+    "jsonLimit": "50mb",
+    "textLimit": "50mb"
+}))
+
+app.use(staticFiles(path.join(__dirname + '../static/')))
+app.use(staticFiles(path.join(__dirname + '../files/')))
+
+// 注册中间件
+app.use(ctx_function())
+
+app.use(controllers.routes())//启动路由
 
 const port = 9000;
 async function startApp() {
+    await DB.init_db()
     app.listen(port);
     console.log('server is start, port='+port)
 }
@@ -47,7 +59,7 @@ const config = {
     },
     http: {
         port: 9999,
-        mediaroot: './static/', // 建议写
+        mediaroot: '../static/', // 建议写
         allow_origin: '*'
     }
 };
