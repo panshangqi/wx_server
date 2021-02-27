@@ -36,7 +36,10 @@ app.use(ctx_function())
 
 app.use(controllers.routes())//启动路由
 
-const port = 9000;
+
+const port = process.env.PORT || 9000;
+const static_port = process.env.STATIC_PORT || 9999;
+
 async function startApp() {
     await DB.init_db()
     app.listen(port);
@@ -58,7 +61,7 @@ const config = {
         ping_timeout: 60
     },
     http: {
-        port: 9999,
+        port: static_port,
         mediaroot: '../static/', // 建议写
         allow_origin: '*'
     }
