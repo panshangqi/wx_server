@@ -36,7 +36,7 @@ const proxy = require('koa2-proxy-middleware'); //引入代理模块
 const proxyOptions = {
     targets: {
         '/api/(.*)': {
-            target: config.server.url + ':' + config.server.port,
+            target: 'http://127.0.0.1:' + config.server.port,
             changeOrigin: true,//处理跨域
             pathRewrite: {
                 "^/api": ""
