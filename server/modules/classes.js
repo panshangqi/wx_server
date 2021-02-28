@@ -76,10 +76,13 @@ module.exports = {
             }
         }
         //console.log(section_data, action)
+        let current_time = new Date().getDate()
         if(action == 'create'){
+            section_data.create_time = current_time
+            section_data.modify_time = current_time
             await DB.section().insertOne(section_data)
         } else if(action == 'modify') {
-            
+            section_data.modify_time = current_time
             await DB.section().updateOne({_id: ObjectID(section_id)},{
                 $set: section_data
             })
