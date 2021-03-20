@@ -11,6 +11,7 @@ module.exports = {
     'create_class': async (class_name) => {
         let data = {
             name: class_name,
+            section_count: 0,
             create_time: new Date().getTime()
         };
         await DB.classes().insertOne(data);
@@ -18,6 +19,10 @@ module.exports = {
 
     'query_class': async () => {
         return await DB.classes().queryMany()
+    },
+
+    'delete_class': async(class_id) => {
+        await DB.classes().deleteOne({_id: ObjectID(class_id)})
     },
     /***
      * 
@@ -88,7 +93,13 @@ module.exports = {
             })
         }
         
-    
+        let section_count = await DB.section().count()
+        
+        await DB.section().updateOne({
+            _id: ObjectID(class_id)
+        },{
+            $set: {section_count: section_count}
+        })
         
     },
 

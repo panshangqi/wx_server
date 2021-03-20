@@ -50,6 +50,21 @@ class Home extends Component {
 
         await this.get_classes()
     }
+    async deletePost(cls){
+        let cls_id = cls._id
+        let cls_name = cls.name
+        if(cls.section_count){
+            message.warning("请先删除章节内容")
+            return
+        }
+        let hr = await Frame.util.confirmDialog("提示",`确定删除【${cls_name}】？`)
+        if(!hr){
+            return
+        }
+        let res = await Frame.http.postSync(Frame.util.make_url('/delete_class'),{class_id: cls_id})
+        console.log(res)
+        this.get_classes()
+    }
     onNameChange(e){
         console.log(e.target.value)
         this.setState({
@@ -76,6 +91,12 @@ class Home extends Component {
                             //window.location.href = Frame.util.make_route('/edit_class')
                             this.props.history.push(`/sections?id=${id}&name=${cls.name}`)
                         }}>编辑课程<Icon type="edit" /></Button>
+                        <Button type="danger" 
+                            className="delete"
+                            onClick={()=>{
+                                this.deletePost(cls)
+                            }}
+                        >删除<Icon type="delete" /></Button>
                     </div>
 
                 </div>

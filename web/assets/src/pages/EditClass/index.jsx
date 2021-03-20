@@ -130,7 +130,7 @@ class EditClass extends Component {
         let data = {title, author, music, content}
         console.log(data)
         //
-        let res = await Frame.http.postSync(Frame.util.make_url('/upload_class'),{
+        let res = await Frame.http.postSync(Frame.util.make_url('/create_and_update_section'),{
             data: data, 
             class_id: this.cls_id, 
             section_id: this.search.section_id || '', 
@@ -189,6 +189,11 @@ class EditClass extends Component {
     onChangeAudio(e){
         let file = document.getElementById('audio_upload').files[0]
         console.log(file)
+        if(file.size > 1024*1024*10){
+            message.warning("音频大小不能超过10MB")
+            return
+        }
+
         let suffix = Frame.util.get_file_suffix(file.name)
         let reader = new FileReader();
         reader.readAsDataURL(file);
@@ -218,6 +223,11 @@ class EditClass extends Component {
         // lastModifiedDate: Date 形式的最后修改时间.
         // size: 文件的字节大小.
         // type: 文件类型.
+        console.log(file)
+        if(file.size > 1024*1024){
+            message.warning("图片大小不能超过1MB")
+            return
+        }
 
         let suffix = Frame.util.get_file_suffix(file.name)
 
@@ -280,27 +290,80 @@ class EditClass extends Component {
             content: content
         })
     }
+    onOpClick(type, id){
+        let content = this.state.content
+        let total = content.length
+        
+        if(type == 'up' && id > 0){
+            let x = id - 1
+            let y = id
+            let temp = content[id-1]
+            content[id-1] = content[id]
+            content[id] = temp
+        }else if(type == 'down' && id + 1 < total){
+            let x = id - 1
+            let y = id
+            let temp = content[id+1]
+            content[id+1] = content[id]
+            content[id] = temp
+        }else if(type == 'del'){
+            content.splice(id, 1)
+        }
+
+        this.setState({
+            content: content
+        })
+    }
+    renderOpBtns(key){
+        let up_classname = "op_button"
+        let down_classname = up_classname
+        if(key == 0){
+            up_classname += " disable"
+        }
+        if(key == this.state.content.length - 1){
+            down_classname += ' disable'
+        }
+
+        return (
+            <div>
+                <Icon type="arrow-up" className={up_classname} onClick={this.onOpClick.bind(this, 'up', key)}/>
+                <Icon type="arrow-down" className={down_classname} onClick={this.onOpClick.bind(this, 'down', key)} />
+                <Icon type="close" className="op_button delete" onClick={this.onOpClick.bind(this, 'del', key)}/>
+            </div>
+        )
+    }
     renderContent(){
         let arr = []
         let key = 0
+        let total = this.state.content.length
         for(let ele of this.state.content){
             if('image' in ele){
                 arr.push((
                     <div className="content-eles" id={'content-eles-'+key} key={key} tag="image">
-                        <Button type="primary" className="upload_btn" onClick={this.onUploadImageClick.bind(this, key)}>
-                            <Icon type="upload" />
-                            上传
-                        </Button>
-                        <span className="tip">图片大小不能超过1M</span>
-                        <input type="file" onChange={this.onChangeImage.bind(this, key)} style={{'display':'none'}}></input>
-                        <img src={ele.image}/>
+                        <div className="left_btns">
+                            <Button type="primary" className="upload_btn" onClick={this.onUploadImageClick.bind(this, key)}>
+                                <Icon type="upload" />
+                                上传
+                            </Button>
+                            <span className="tip">图片大小不能超过1M</span>
+                            <input type="file" onChange={this.onChangeImage.bind(this, key)} style={{'display':'none'}}></input>
+                            <img src={ele.image}/>
+                        </div>
+                        <div className="op_btns">
+                            {this.renderOpBtns(key)}
+                        </div>
                     </div>
                 ))
             }else if('text' in ele){
                 arr.push((
                     <div className="content-eles" id={'content-eles-'+key} key={key} tag="text" >
-                        文本：
-                        <textarea value={ele.text} onChange={this.onTextChange.bind(this, key)}/>
+                        <div className="left_btns">
+                            文本：
+                            <textarea value={ele.text} onChange={this.onTextChange.bind(this, key)}/>
+                        </div>
+                        <div className="op_btns">
+                            {this.renderOpBtns(key)}
+                        </div>
                     </div>
                 ))
             }
@@ -339,10 +402,10 @@ class EditClass extends Component {
                 <div className='audio_box'>音频：
                     <input type="file" id="audio_upload" onChange={this.onChangeAudio.bind(this)}></input>
 
-
                     <audio controls id="audio_mp3" className="audio_play" src={this.state.music.audio}>
                         <source type="audio/mpeg"/>
                     </audio>
+                    <span className="tip">音频大小不能超过10M</span>
                 </div>
                 <div className="cut_line"/>
                 <div className="edit_content">内容：

@@ -43,6 +43,14 @@ router.post('/create_class',async (ctx)=>{
     ctx.rest()
 });
 
+router.post('/delete_class',async (ctx)=>{
+
+    let { class_id } = ctx.checkParameter(['class_id']);
+
+    await Classes.delete_class(class_id);
+    ctx.rest()
+});
+
 router.get('/get_sections', async(ctx)=>{
     let { class_id, section_id } = ctx.checkParameter(['class_id']);
     console.log(class_id, section_id)
@@ -50,7 +58,7 @@ router.get('/get_sections', async(ctx)=>{
     ctx.rest(datas)
 })
 
-router.post('/upload_class',async (ctx)=> {
+router.post('/create_and_update_section',async (ctx)=> {
 
     let {data, class_id, section_id, action} = ctx.checkParameter(['data', 'class_id', 'section_id' ,'action']);
     let save_dir = path.join(__dirname, `../../static/${class_id}`);

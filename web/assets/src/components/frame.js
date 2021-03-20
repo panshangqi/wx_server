@@ -1,5 +1,6 @@
 import 'whatwg-fetch';
-import {Button,Input,message,Icon} from 'antd'
+import {Button,Input,message,Icon, Modal} from 'antd'
+const confirmDlg = Modal.confirm
 const env_dev = process.env.NODE_ENV === 'development';
 const Frames = {}
 function paramFormat(obj){
@@ -191,6 +192,20 @@ Frames.util = {
         }else {
             message.destroy()
         }
+    },
+    confirmDialog(title, content){
+        return new Promise((resolve, reject)=>{
+            confirmDlg({
+                title: title,
+                content: content,
+                onOk() {
+                    resolve(true)
+                },
+                onCancel() {
+                    resolve(false)
+                },
+              });
+        })
     }
 }
 export default Frames;

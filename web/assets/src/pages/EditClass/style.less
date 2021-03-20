@@ -137,11 +137,41 @@
             position: absolute;
             top: -14px;
         }
+        .tip{
+            margin-left: 350px;
+            font-size: 13px;
+            color: #f00;
+        }
     }
     .content-eles{
         margin-top: 15px;
         background-color: #1c6fe222;
         padding: 15px;
+        display: flex;
+        .left_btns{
+            flex: 1;
+        }
+        .op_btns{
+            width: 122px;
+            .op_button{
+                margin-left: 10px;
+                font-size: 22px;
+                color: #1c6fe2;
+                
+                &:hover{
+                    background-color: #1c6fe230;
+                }
+            }
+            .delete{
+                color: #ff0000;
+                &:hover{
+                    background-color: #ff000030;
+                }
+            }
+            .disable{
+                color: #aaa;
+            }
+        }
         img{
             width: 200px;
             margin-left: 50px;
@@ -150,7 +180,8 @@
             margin-right: 10px;
         }
         .tip{
-            font-size: 12px;
+            font-size: 13px;
+            color: #ff0000;
         }
     }  
 }
