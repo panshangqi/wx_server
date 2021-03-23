@@ -81,7 +81,8 @@ module.exports = {
             }
         }
         //console.log(section_data, action)
-        let current_time = new Date().getDate()
+        let current_time = new Date().getTime()
+        console.log(current_time)
         if(action == 'create'){
             section_data.create_time = current_time
             section_data.modify_time = current_time
