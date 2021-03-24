@@ -5,6 +5,7 @@ const path = require('path')
 const md5 = require('md5')
 const Upload = require('../modules/upload')
 const Classes = require('../modules/classes');
+const Login = require('../modules/login')
 const config = require('../config');
 
 // render html
@@ -16,6 +17,17 @@ router.get('/index', (ctx, next) => {
     ctx.response.body = html_buffer.toString()
 })
 
+router.post('/login', async (ctx, next) => {
+    let { username, password } = ctx.checkParameter(['username','password']);
+    let hr = await Login.check_login(username, password)
+    
+    ctx.rest({status: hr, username: username, user_id: username, token: '123456'})
+})
+router.post('/logout', async (ctx, next) => {
+    let { username } = ctx.checkParameter(['username']);
+    
+    ctx.rest({})
+})
 
 router.get('/',(ctx)=>{
     ctx.response.type = 'html';

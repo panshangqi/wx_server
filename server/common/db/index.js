@@ -35,6 +35,11 @@ class DB {
         this.c_classes = new mongoOp(this.db_amway, 'classes')
         this.c_section = new mongoOp(this.db_amway, 'section')
         this.c_comment = new mongoOp(this.db_amway, 'comment')
+        this.c_login = new mongoOp(this.db_amway, 'login')
+    }
+
+    login(){
+        return this.c_login
     }
 
     classes(){

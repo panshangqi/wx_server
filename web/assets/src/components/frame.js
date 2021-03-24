@@ -208,4 +208,19 @@ Frames.util = {
         })
     }
 }
+
+Frames.cookies = {
+    set_cookies: (value) => {
+        localStorage.setItem('wx_server_auth', JSON.stringify(value));
+    },
+    get_cookies: () => {
+        let value = localStorage.getItem("wx_server_auth");
+        if (!value)
+            return null
+        return JSON.parse(value)
+    },
+    del_cookies: ()=>{
+        window.localStorage.removeItem('wx_server_auth')
+    }
+};
 export default Frames;
