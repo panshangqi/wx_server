@@ -3,11 +3,12 @@ const router = KoaRouter();
 const fs = require('fs')
 const path = require('path')
 const md5 = require('md5')
+const uuid = require('node-uuid')
 const Upload = require('../modules/upload')
 const Classes = require('../modules/classes');
 const Login = require('../modules/login')
 const config = require('../config');
-
+// const redis = require('../common/redis_op')
 // render html
 router.get('/index', (ctx, next) => {
     ctx.type = 'text/html;charset=utf-8';
@@ -17,15 +18,15 @@ router.get('/index', (ctx, next) => {
     ctx.response.body = html_buffer.toString()
 })
 
-router.post('/login', async (ctx, next) => {
+router.post('/check_login', async (ctx, next) => {
     let { username, password } = ctx.checkParameter(['username','password']);
     let hr = await Login.check_login(username, password)
-    
-    ctx.rest({status: hr, username: username, user_id: username, token: '123456'})
+
+    ctx.rest({status: hr, username: username, user_id: username})
 })
 router.post('/logout', async (ctx, next) => {
     let { username } = ctx.checkParameter(['username']);
-    
+    await redis.del(username)
     ctx.rest({})
 })
 

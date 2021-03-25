@@ -15,7 +15,7 @@ module.exports = function() {
     return async(ctx, next) => {
         let cur_route = get_route(ctx.request.url)
         console.log(cur_route)
-        if(cur_route.startsWith('/light_support')){
+        if(cur_route.startsWith('/api')){
 
             let check = await ctx.check_login()
             if(!check){

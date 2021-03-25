@@ -21,7 +21,7 @@ class Home extends Component {
     }
     async get_classes(){
         let res = await Frame.http.getSync(Frame.util.make_url('/get_classes'),{})
-        console.log(res)
+        console.log(res,'==============')
         let classes = res.body
         classes.sort((a, b)=>{
             return b.create_time - a.create_time

@@ -1,7 +1,9 @@
+import React from 'react'
 import 'whatwg-fetch';
 import {Button,Input,message,Icon, Modal} from 'antd'
 const confirmDlg = Modal.confirm
 const env_dev = process.env.NODE_ENV === 'development';
+
 const Frames = {}
 function paramFormat(obj){
     var str = ''
@@ -12,6 +14,22 @@ function paramFormat(obj){
         str += `${key}=${obj[key]}`
     }
     return str;
+}
+function error_alert(code, message) {
+    
+    Modal.error({
+        title: code,
+        content: (
+            <div>
+                <p>{message}</p>
+            </div>
+        ),
+        onOk() {
+            if (code === 401) {
+                window.location.href = Frames.util.make_route('/login');
+            }
+        }
+    });
 }
 function common_fetch(method, url, reqParams = {}, callback, fn_err){
     const dtime = new Date().getTime()
@@ -27,6 +45,11 @@ function common_fetch(method, url, reqParams = {}, callback, fn_err){
         }
     }
     params.t = dtime
+
+    const cookies = Frames.cookies.get_cookies();
+    setting.headers.token = cookies && cookies.token || '';
+    setting.headers.username = cookies && cookies.username || ''
+
     if(method == 'post' || method == 'put'){
         setting.body = JSON.stringify(params)
     }else{ //get delete
@@ -71,11 +94,16 @@ function common_fetch(method, url, reqParams = {}, callback, fn_err){
         return res.json()
     }
     function success(res_data){
-        if(typeof callback === 'function'){
-            callback(res_data)
+        
+        if (res_data.type == 'AJAX')
+            callback(res_data);
+        else {
+            
+            error_alert(res_data.code, res_data.message);
         }
     }
     function net_error(err){
+        console.log(err)
         if(typeof fn_err === 'function'){
             fn_err(500)
         }
@@ -105,8 +133,11 @@ Frames.http = {
             Frames.http.get(url, reqParam, function (data) {
                 resolve(data)
             },function (err_code) {
-                resolve(err_code)
+                //reject(err_code)
+                throw new Error(`Http Error Code: ${err_code}`)
             })
+        }).catch(e => {
+            console.log(e)
         })
     },
     postSync(url, reqParam){
@@ -114,8 +145,11 @@ Frames.http = {
             Frames.http.post(url, reqParam, function (data) {
                 resolve(data)
             },function (err_code) {
-                resolve(err_code)
+                //reject(err_code)
+                throw new Error(`Http Error Code: ${err_code}`)
             })
+        }).catch(e => {
+            console.log(e)
         })
     }
 };
@@ -151,6 +185,12 @@ Frames.util = {
             return '/api' + route
         }
         return '/api' + route
+    },
+    make_client_url:(route)=>{
+        if(env_dev){
+            return '/client' + route
+        }
+        return '/client' + route
     },
     get_url_params: (url) => {
         if (!url)

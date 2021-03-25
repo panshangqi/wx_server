@@ -5,35 +5,38 @@ const md5 = require('md5')
 const fs = require('fs')
 const path = require('path')
 const http = require('./http')
-const redisOp = require('./redis_op')
+const redisOp = require('../../server/common/redis_op')
 const ApiError = require('./api_error')
 
-router.get('/user/session', async (ctx, next)=>{
-    let params = ctx.checkParameter(['ticket', 'backup_url'])
-    let res = await http.getSync('https://sso.oaloft.com/cas/validate', {
-        service: params.backup_url, ticket: params.ticket}, false)
-    let response = {}
-    let results = res.split('\n')
-    if(!results || results[0] == 'no'){
-        response = {
-            success: 'no',
-            message: 'sso 登录失败'
-        }
-    } else if(results && results[0] == 'yes') {
+router.post('/client/login', async (ctx, next)=>{
+    
+    let { username, password } = ctx.checkParameter(['username', 'password'])
+    console.log(username, password)
+    let res = await http.postSync('http://127.0.0.1:9000/check_login', {username, password}, true)
+    console.log(res)
+    if(res && res.type == 'AJAX' && res.body.status == true) {
+        //密码校验成功
         //生成token并存储redis
         let token = md5(uuid.v1())
-        let username = results[1]
+        
         redisOp.set(username, JSON.stringify({
             token: token,
             stime: new Date().getTime()
-        }), 24*3600) //设置中台过期时间 一天
+        }), 3600) //设置中台过期时间 一天
         response = {
             success: 'yes',
-            message: 'sso 登录成功',
+            message: '登录成功',
             username: username,
             token: token
         }
     }
+    else {
+        response = {
+            success: 'no',
+            message: '登录失败'
+        }
+    }
+
     ctx.rest(response)
 })
 router.post('/logout', async(ctx, next)=> {
@@ -55,7 +58,7 @@ router.get('/index', (ctx, next) => {
 })
 
 //权限
-router.get('/check/login/status', async (ctx, next) => {
+router.get('/client/check/login/status', async (ctx, next) => {
 
     let check = await ctx.check_login()
     if (!check) {

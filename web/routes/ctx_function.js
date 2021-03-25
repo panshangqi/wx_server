@@ -2,7 +2,7 @@
  * 在app.use(router)之前调用
  */
 const ApiError = require('./api_error')
-const redisOp = require('./redis_op')
+const redisOp = require('../../server/common/redis_op')
 module.exports = function() {
     return async(ctx, next) => {
         ctx.rest = (data) => {
@@ -22,6 +22,7 @@ module.exports = function() {
             if(!need_params){
                 return requestBody
             }
+            
             if(typeof need_params == 'string'){
                 if(requestBody[need_params] == undefined){
                     throw ApiError.ErrorForNeedParameter(need_params)
@@ -42,12 +43,12 @@ module.exports = function() {
         ctx.check_login = async () => {
             //检查登录
             let token = ctx.headers.token || undefined
-            let user_id = ctx.headers.uid || undefined
-            console.log(`token=${token}, user_id=${user_id}`)
-            if (!token || !user_id) {
+            let username = ctx.headers.username || undefined
+            console.log(`token=${token}, username=${username}`)
+            if (!token || !username) {
                 return false
             }
-            let check_res = await redisOp.get(user_id)
+            let check_res = await redisOp.get(username)
             console.log(check_res, typeof check_res)
             if (!check_res) {
                 return false

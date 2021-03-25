@@ -51,9 +51,14 @@ const proxyOptions = {
 app.use(koaLogger((str, args) => {
     console.log(new Date().toLocaleString() + str)
 }))
+app.use(bodyParser({
+    "formLimit": "50mb",
+    "jsonLimit": "50mb",
+    "textLimit": "50mb"
+}))
 // 注册中间件
 app.use(ctx_function())
-//app.use(authenticated())
+app.use(authenticated())
 app.use(proxy(proxyOptions))
 
 

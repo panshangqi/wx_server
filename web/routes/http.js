@@ -32,20 +32,24 @@ const HTTP = {
             throw new Error(e.stack)
         })
     },
-    postSync: function (url, data, dataType) {
+    postSync: function (url, data, dataType=true) {
+        console.log(data)
         return new Promise((resolve, reject)=>{
             request({
                 url: url,
                 method: "POST",
                 json: dataType? true: false,
-                headers: {},
+                headers: {
+                    "content-type": "application/json",
+                },
                 body: data
             }, function (error, response, body) {
                 //console.log(response)
-                //console.log(body)
+                console.log(body)
                 if (!error && response.statusCode == 200) {
                     resolve(body)
                 } else {
+                    console.log('+++++++++--------------')
                     console.log(error)
                     throw new Error(error.stack)
                 }

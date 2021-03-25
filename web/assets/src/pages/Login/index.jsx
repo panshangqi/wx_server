@@ -28,10 +28,10 @@ class Login extends Component {
         this.checkLogin()
     }
     async checkLogin(){
-        let hr = await Frame.http.getSync(Frame.util.make_url('/check/login/status'))
+        let hr = await Frame.http.getSync('/client/check/login/status')
         console.log('login status', hr)
-        if(hr.status == 'success'){
-            window.location.href = Frame.util.make_route('/every_data')
+        if(hr && hr.type == 'AJAX' && hr.body.status == 'success'){
+            this.props.history.push(`/home`)
         }
     }
     componentWillUnmount(){
@@ -39,12 +39,12 @@ class Login extends Component {
     }
     async login() {
 
-        let res = await Frame.http.postSync(Frame.util.make_url('/login'),{
+        let res = await Frame.http.postSync('/client/login',{
             username: this.state.username,
             password: this.state.password
         })
         console.log(res)
-        if(res && res.type == 'AJAX' && res.body.status == true) {
+        if(res && res.type == 'AJAX' && res.body.success == 'yes') {
             Frame.cookies.set_cookies({
                 token: res.body.token,
                 username: res.body.username
