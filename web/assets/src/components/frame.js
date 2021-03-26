@@ -246,6 +246,26 @@ Frames.util = {
                 },
               });
         })
+    },
+    toDataUrl(url, callback) {
+
+        return new Promise((resolve, reject)=>{
+            let xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+                let reader = new FileReader();
+                reader.onloadend = function() {
+                    
+                    if(typeof callback == 'function'){
+                        callback(reader.result);
+                    }
+                    resolve(reader.result)
+                }
+                reader.readAsDataURL(xhr.response);
+            };
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+            xhr.send();
+        })
     }
 }
 

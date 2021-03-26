@@ -3,6 +3,7 @@
  */
 
 const redisOp = require('./redis_op')
+require('./console_light')
 function get_route(url){
     let pos = url.indexOf('?')
     if(pos > -1){
@@ -13,9 +14,11 @@ function get_route(url){
 
 module.exports = function() {
     return async(ctx, next) => {
-        let cur_route = get_route(ctx.request.url)
-        console.log(cur_route)
-        if(cur_route.startsWith('/api')){
+        //console.log(ctx.request)
+        let method = ctx.request.method
+        let url = ctx.request.url
+        console.success(`${method} \t\t\t\t ${url}`)
+        if(url.startsWith('/api')){
 
             let check = await ctx.check_login()
             if(!check){

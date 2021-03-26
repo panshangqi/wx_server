@@ -51,16 +51,19 @@ const proxyOptions = {
 app.use(koaLogger((str, args) => {
     console.log(new Date().toLocaleString() + str)
 }))
-app.use(bodyParser({
-    "formLimit": "50mb",
-    "jsonLimit": "50mb",
-    "textLimit": "50mb"
-}))
+
+
 // 注册中间件
 app.use(ctx_function())
 app.use(authenticated())
 app.use(proxy(proxyOptions))
 
+// bodyParser 一定要放到 koa2-proxy-middleware 下面
+app.use(bodyParser({
+    "formLimit": "50mb",
+    "jsonLimit": "50mb",
+    "textLimit": "50mb"
+}))
 
 app.use(router.routes())//启动路由
 app.use(router.allowedMethods());

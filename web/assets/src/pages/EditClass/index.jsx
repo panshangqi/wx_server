@@ -383,8 +383,12 @@ class EditClass extends Component {
             author: e.target.value
         })
     }
-    toBackClick(){
-        this.props.history.push(`/sections?id=${this.cls_id}&name=${this.cls_name}`)
+    async toBackClick(){
+        let hr = await Frame.util.confirmDialog("提示","返回将不保留任何信息，确定退出？")
+        if(hr){
+            this.props.history.push(`/sections?id=${this.cls_id}&name=${this.cls_name}`)
+        }
+        
     }
     
     render() {

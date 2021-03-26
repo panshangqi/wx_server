@@ -8,6 +8,7 @@ const Upload = require('../modules/upload')
 const Classes = require('../modules/classes');
 const Login = require('../modules/login')
 const config = require('../config');
+const Common = require('../common')
 // const redis = require('../common/redis_op')
 // render html
 router.get('/index', (ctx, next) => {
@@ -26,7 +27,7 @@ router.post('/check_login', async (ctx, next) => {
 })
 router.post('/logout', async (ctx, next) => {
     let { username } = ctx.checkParameter(['username']);
-    await redis.del(username)
+    //await redis.del(username)
     ctx.rest({})
 })
 
@@ -43,16 +44,20 @@ router.get('/config',(ctx)=>{
 });
 
 router.get('/get_classes',async(ctx)=>{
-
-    let datas = await Classes.query_class();
+    let { class_id } = ctx.checkParameter(['class_id']);
+    
+    let datas = await Classes.query_class(class_id);
     ctx.rest(datas)
 });
 
 router.post('/create_class',async (ctx)=>{
 
-    let { name } = ctx.checkParameter(['name']);
-
-    await Classes.create_class(name);
+    let {action, data, class_id } = ctx.checkParameter(['action','data']);
+    let save_dir = path.join(__dirname, `../../static/${Common.Define.class_images}`);
+    if(!fs.existsSync(save_dir)){
+        fs.mkdirSync(save_dir)
+    }
+    await Classes.create_and_modify_class(action, data, class_id, save_dir);
     ctx.rest()
 });
 

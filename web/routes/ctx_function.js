@@ -44,12 +44,12 @@ module.exports = function() {
             //检查登录
             let token = ctx.headers.token || undefined
             let username = ctx.headers.username || undefined
-            console.log(`token=${token}, username=${username}`)
+            console.success(`check login: token=${token}, username=${username}`)
             if (!token || !username) {
                 return false
             }
             let check_res = await redisOp.get(username)
-            console.log(check_res, typeof check_res)
+            
             if (!check_res) {
                 return false
             }

@@ -20,7 +20,7 @@ class Home extends Component {
 
     }
     async get_classes(){
-        let res = await Frame.http.getSync(Frame.util.make_url('/get_classes'),{})
+        let res = await Frame.http.getSync(Frame.util.make_url('/get_classes'),{class_id: -1})
         console.log(res,'==============')
         let classes = res.body
         classes.sort((a, b)=>{
@@ -31,10 +31,11 @@ class Home extends Component {
         })
     }
     onCreateClick(){
-        this.setState({
-            name: '',
-            visible: true
-        })
+        // this.setState({
+        //     name: '',
+        //     visible: true
+        // })
+        this.props.history.push(`/create_class`)
     }
     async createPost(){
         if(!this.state.name){
@@ -79,7 +80,9 @@ class Home extends Component {
             arr.push((
                 <div className="item_box" key={id}>
                     <div className="left">
-                        <div className="title">{cls.name}</div>
+                        <div className="title">{cls.title}<span className="sub_title">({cls.sub_title})</span></div>
+                        
+                        <div className="introduction"><span>课程简介：</span>{cls.introduction}</div>
                         <span className="info">
                             <span>id:</span> {id}
                         </span>
@@ -90,7 +93,14 @@ class Home extends Component {
                             console.log(cls.id)
                             //window.location.href = Frame.util.make_route('/edit_class')
                             this.props.history.push(`/sections?id=${id}&name=${cls.name}`)
-                        }}>编辑课程<Icon type="edit" /></Button>
+                        }}>编辑章节<Icon type="form" /></Button>
+
+                        <Button type="primary" className="modify" onClick={()=>{
+                            console.log(cls.id)
+                            //window.location.href = Frame.util.make_route('/edit_class')
+                            this.props.history.push(`/create_class?id=${id}&name=${cls.name}`)
+                        }}>修改课程<Icon type="edit" /></Button>
+
                         <Button type="danger" 
                             className="delete"
                             onClick={()=>{

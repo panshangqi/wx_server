@@ -9,6 +9,7 @@ import Login from '@pages/Login'
 import Home from '@pages/Home'
 import EditClass from '@pages/EditClass'
 import Sections from '@pages/Sections'
+import CreateClass from '@pages/CreateClass'
 import BasePage from '@components/BasePage'
 import Frames from '@components/frame'
 
@@ -89,6 +90,7 @@ class AuthRouteEx extends React.Component {
                     <Switch>
                         <Route exact path="/login" component={Login}/>
                         <this.PrivateRoute exact path={'/home'} component={Home} />
+                        <this.PrivateRoute exact path={"/create_class"} component={CreateClass} />
                         <this.PrivateRoute exact path={"/sections"} component={Sections} />
                         <this.PrivateRoute exact path={"/edit_class"} component={EditClass} />
                         <Redirect to="/home" />

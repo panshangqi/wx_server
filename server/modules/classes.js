@@ -8,17 +8,53 @@ const common = require('../common')
 
 module.exports = {
 
-    'create_class': async (class_name) => {
-        let data = {
-            name: class_name,
-            section_count: 0,
-            create_time: new Date().getTime()
+    'create_and_modify_class': async (action, data, class_id,save_dir) => {
+        let timer = new Date().getTime()
+        let extension = data.background.extension
+
+        let base64str = data.background['image']
+        let file_md5 = md5(base64str)
+        let save_path = path.join(save_dir, `${file_md5}.${extension}`)
+        console.log(save_path)
+        Upload.save_image(base64str, save_path)
+
+        let class_data = {
+            title: data.title,
+            name: data.title,
+            sub_title: data.sub_title,
+            background: {
+                image: `/${common.Define.class_images}/${file_md5}.${extension}`,
+                extension: extension
+            },
+            
+            introduction: data.introduction,
+            
         };
-        await DB.classes().insertOne(data);
+        console.log(action, class_id)
+        if(action == 'create'){
+            class_data.section_count = 0
+            class_data.create_time = timer
+            class_data.modify_time = timer
+            await DB.classes().insertOne(class_data);
+        }
+        else if(action == 'modify' && class_id){
+            class_data.modify_time = timer
+            await DB.classes().updateOne({_id: ObjectID(class_id)},{
+                $set: class_data
+            })
+        }
     },
 
-    'query_class': async () => {
-        return await DB.classes().queryMany()
+    'query_class': async (class_id) => {
+        if(class_id == -1){
+            return await DB.classes().queryMany()
+        }
+        let classInfo = await DB.classes().queryOne({_id: ObjectID(String(class_id))})
+        if(classInfo){
+            classInfo.background.image = common.make_static_url(classInfo.background.image)
+            return classInfo
+        }
+        
     },
 
     'delete_class': async(class_id) => {
@@ -38,7 +74,7 @@ module.exports = {
         3: {image: undefined}
      */
     'create_section': async (action, data, class_id, section_id, save_dir)=>{
-        delete data._id
+        
         let content = data.content;
         let section_data = {
             title: data.title,
