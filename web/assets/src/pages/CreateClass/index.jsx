@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import {Button,Input,Modal,message,Icon} from 'antd'
 import Frame from '@components/frame'
+import RichEditer from '@components/RichEditer'
 import $ from 'jquery'
 import './style.less'
 
@@ -23,13 +24,15 @@ class CreateClass extends Component {
                 image: null,
                 extension: null
             },
-
+            rich_text: '',
             classes: []
         }
     }
     componentDidMount(){
         this.get_classes()
+
     }
+    
     componentWillUnmount(){
 
     }
@@ -43,12 +46,13 @@ class CreateClass extends Component {
             name: class_info.name,
             title: class_info.title,
             sub_title: class_info.sub_title,
-            introduction: class_info.introduction,
+            //introduction: class_info.introduction,
             background: {
                 image: base64str,
                 extension: class_info.background.extension
             }
         })
+        this.refs.rich_editer.setHtml(class_info.introduction)
     }
     async toBackClick(){
         let hr = await Frame.util.confirmDialog("提示","返回将不保留任何信息，确定退出？")
@@ -77,16 +81,18 @@ class CreateClass extends Component {
             message.warning("背景图片不能为空")
             return
         }
-        if(!this.state.introduction){
+        let rich_text = this.refs.rich_editer.getHtml()
+        if(!rich_text){
             message.warning("课程简介不能为空")
             return
         }
+        
         let res = await Frame.http.postSync(Frame.util.make_url('/create_class'),{
             data: {
                 title: this.state.title,
                 sub_title: this.state.sub_title,
                 background: this.state.background,
-                introduction: this.state.introduction
+                introduction: rich_text //this.state.introduction
             },
             class_id: this.cls_id,
             action: this.cls_id ? 'modify':'create'
@@ -167,7 +173,21 @@ class CreateClass extends Component {
                 <div className="cut_line"/>
                 <div className="introduction" id={'introduction'} >
                     <div className="title_in">课程简介</div>
-                    <textarea value={this.state.introduction} onChange={this.onTextChange.bind(this)}/>
+                    <textarea style={{display: 'none'}} value={this.state.introduction} onChange={this.onTextChange.bind(this)}/>
+                    <RichEditer ref="rich_editer"/>
+                </div>
+                <div className="richEdit">
+                    
+                </div>
+                <Button onClick={()=>{
+                    let text = this.refs.rich_editer.getHtml()
+                    console.log(text)
+                    this.setState({
+                        rich_text: text
+                    })
+                }} >测试</Button>
+                <div>
+                <div dangerouslySetInnerHTML = {{ __html: this.state.rich_text }} className="context_panel"></div>
                 </div>
             </div>
         );
@@ -175,3 +195,33 @@ class CreateClass extends Component {
 }
 
 export default CreateClass;
+/*
+<Editor
+                        className='min-h300'
+                        apiKey='Your_Key'
+                        ref='tinyEditor'
+                        // automatic_uploads={!false}
+                        // images_upload_url={utils.url + '/fileclient-management/api/uploadpic'}
+                        // images_upload_handler={this.imagesUploadHandler}
+                        // initialValue='<p>在此輸入您的資訊內容</p>'
+                        value={this.state.content}
+                        init={{
+                        min_height: 500,
+                        theme: 'modern',
+                        // language: 'zh_TW',
+                        // skin: 'lightgray',
+                        // menubar: false, // 頂部菜單
+                        // resize: false, // 右下角調整大小
+                        statusbar: false, // 底部狀態欄
+                        object_resizing: false, // 禁止設置媒體大小
+                        images_upload_url: utils.url + '/fileclient-management/api/uploadpic',
+                        images_upload_handler: this.imagesUploadHandler,
+                        images_reuse_filename: true,
+                        plugins: 'table advlist image lists preview textcolor', // imagetools 圖片編輯工具-剪切、旋轉、設置大小
+                        toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat | image'
+                        // image_description: false, // 图像对话框中的图像描述输入字段
+                        // image_caption: true // 圖片下的文字
+                        // image_title: true
+                        }}
+                    />
+*/
