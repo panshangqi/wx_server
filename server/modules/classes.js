@@ -91,7 +91,8 @@ module.exports = {
 
         section_data.music = {
             audio: `/${class_id}/${audio_md5}.${music.extension}`,
-            extension: music.extension
+            extension: music.extension,
+            duration: music.duration
         } 
 
         for(let obj of content){

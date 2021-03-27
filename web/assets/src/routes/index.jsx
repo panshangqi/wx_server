@@ -10,6 +10,7 @@ import Home from '@pages/Home'
 import EditClass from '@pages/EditClass'
 import Sections from '@pages/Sections'
 import CreateClass from '@pages/CreateClass'
+import SVG_SCSS from '@pages/SVG_SCSS'
 import BasePage from '@components/BasePage'
 import Frames from '@components/frame'
 
@@ -93,6 +94,7 @@ class AuthRouteEx extends React.Component {
                         <this.PrivateRoute exact path={"/create_class"} component={CreateClass} />
                         <this.PrivateRoute exact path={"/sections"} component={Sections} />
                         <this.PrivateRoute exact path={"/edit_class"} component={EditClass} />
+                        <this.PrivateRoute exact path={"/svg_scss"} component={SVG_SCSS} />
                         <Redirect to="/home" />
                     </Switch>
                 </BasePage>

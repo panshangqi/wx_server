@@ -9,6 +9,7 @@ const { Header, Sider, Content } = Layout;
 import './style.less'
 let menu_config = [
     {key: '0' , route: '/home', icon: 'windows', name: '首页'},
+    {key: '1' , route: '/svg_scss', icon: 'code', name: 'SVGSCSS'},
     //{key: '1' , route: '/edit_class', icon: 'edit', name: '编辑课程'}
 ]
 class BasePage extends Component {

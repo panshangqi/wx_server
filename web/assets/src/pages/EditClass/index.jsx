@@ -8,26 +8,7 @@ import phone_bg from '@imgs/phone_box.png'
 import header_music from '@imgs/header-music.png'
 const { TextArea } = Input;
 
-function toDataUrl(url, callback) {
 
-    return new Promise((resolve, reject)=>{
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function() {
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                
-                if(typeof callback == 'function'){
-                    callback(reader.result);
-                }
-                resolve(reader.result)
-            }
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    })
-}
 
 
 class EditClass extends Component {
@@ -45,6 +26,7 @@ class EditClass extends Component {
             music: {
                 audio: '',
                 extension: '',
+                duration: 0 //音频时间长
             },
             visible: false,
             section_info: null
@@ -57,7 +39,6 @@ class EditClass extends Component {
             this.action = 'modify'
             this.init()
         }
-        
     }
     componentWillUnmount(){
 
@@ -67,7 +48,7 @@ class EditClass extends Component {
         console.log(res)
         let section_info = res.body
         let audio_url = section_info.music.audio
-        toDataUrl(audio_url, (result)=>{
+        Frame.util.toDataUrl(audio_url, (result)=>{
             this.setState({
                 music: {
                     audio: result,
@@ -80,7 +61,7 @@ class EditClass extends Component {
         //section_info.music.audio = audioBase64
         for(let con of section_info.content) {
             if('image' in con) {
-                let base64str = await toDataUrl(con['image'])
+                let base64str = await Frame.util.toDataUrl(con['image'])
                 con.image = base64str
             }
         }
@@ -100,6 +81,10 @@ class EditClass extends Component {
         }
         if(!this.state.music.extension){
             message.warning("音乐未选择")
+            return
+        }
+        if(!this.state.music.duration){
+            message.warning("正在计算音乐时长")
             return
         }
         if(!this.state.author){
@@ -185,6 +170,16 @@ class EditClass extends Component {
         }
 
         return arr
+    }
+    onLoadedmetadata(e){
+        console.log(e)
+        let time = $('#audio_mp3')[0].duration
+        console.log(time)
+        let music = this.state.music
+        music.duration = time
+        this.setState({
+            music: music
+        })
     }
     onChangeAudio(e){
         let file = document.getElementById('audio_upload').files[0]
@@ -406,7 +401,12 @@ class EditClass extends Component {
                 <div className='audio_box'>音频：
                     <input type="file" id="audio_upload" onChange={this.onChangeAudio.bind(this)}></input>
 
-                    <audio controls id="audio_mp3" className="audio_play" src={this.state.music.audio}>
+                    <audio controls 
+                            id="audio_mp3" 
+                            className="audio_play" 
+                            src={this.state.music.audio}
+                            onLoadedMetadata={this.onLoadedmetadata.bind(this)}
+                    >
                         <source type="audio/mpeg"/>
                     </audio>
                     <span className="tip">音频大小不能超过10M</span>
