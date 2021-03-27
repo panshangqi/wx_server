@@ -3,3 +3,4 @@ web/node_modules/
 server/node_modules/
 server/config/
 .idea/
+.gitx/
